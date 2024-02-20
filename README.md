@@ -1,4 +1,4 @@
-This is a fork of the project below with small modifications to be used in the paper "On the Overconfidence Problem in Semantic 3D Mapping"
+This is a fork of the project below with small modifications to be used in the paper "On the Overconfidence Problem in Semantic 3D Mapping" - namely, to include a mDECE loss.
 
 # Meta-Calibration: Learning of Model Calibration Using Differentiable Expected Calibration Error
 
