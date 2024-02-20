@@ -1,4 +1,7 @@
+This is a fork of the project below with small modifications to be used in the paper "On the Overconfidence Problem in Semantic 3D Mapping"
+
 # Meta-Calibration: Learning of Model Calibration Using Differentiable Expected Calibration Error
+
 
 [[Paper]](https://arxiv.org/abs/2106.09613)
 
