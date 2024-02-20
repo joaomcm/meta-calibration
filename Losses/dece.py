@@ -95,7 +95,8 @@ class DECE(nn.Module):
         # For CIFAR-10 and CIFAR-100, target.shape is [N] to begin with
         target = target.view(-1)
 
-        predicted_probs = F.softmax(input, dim=1)
+        predicted_probs = input
+        # predicted_probs = F.softmax(input, dim=1)
 
         cut_points = torch.linspace(0, 1, self.num_bins + 1)[:-1].to(device=self.device)
         W = torch.reshape(torch.linspace(1.0, self.num_bins, self.num_bins).to(device=self.device), [1, -1])
@@ -137,3 +138,36 @@ class DECE(nn.Module):
         # calculate overall ECE for the whole batch
         ece = torch.sum(torch.sum(bin_probs, dim=0) * torch.abs(bin_accs - bin_confs) / bin_probs.shape[0], dim=0)
         return ece
+
+class mDECE(DECE):
+    def __init__(self, device, num_bins, t_a, t_b,ignore_class = 0):
+        super().__init__(device, num_bins, t_a, t_b)
+        self.ignore_class = ignore_class
+    def forward(self, input, target):
+        gt_classes = torch.unique(target)
+        total = torch.Tensor([0]).to('cuda:0')
+        for c in gt_classes:
+            if(c == self.ignore_class):
+                pass
+            else:
+                mask = target==c
+                total+= super().forward(input[mask],target[mask])
+        return total/gt_classes.shape[0]
+    
+class mDECE_fix(DECE):
+    def __init__(self, device, num_bins, t_a, t_b,ignore_class = 0):
+        super().__init__(device, num_bins, t_a, t_b)
+        self.ignore_class = ignore_class
+    def forward(self, input, target):
+        total = torch.Tensor([0]).to('cuda:0')
+        pred = input.argmax(axis = 1)
+        avail_classes = torch.unique(pred)
+
+        for c in avail_classes:
+            if(c == self.ignore_class):
+                pass
+            else:
+                mask = pred==c
+                if(mask.sum()!=0):
+                    total+= super().forward(input[mask],target[mask])
+        return total/avail_classes.shape[0]
